@@ -61,17 +61,7 @@ This starts the server and opens your task manager automatically. Add your tasks
 
 ---
 
-## Screenshots
 
-> Task manager — add and track your daily tasks
-
-![Task Manager](screenshots/taskmanager.png)
-
-> Instagram blocked — redirected when tasks are incomplete
-
-![Blocked](screenshots/blocked.png)
-
----
 
 ## Files
 
