@@ -3,7 +3,7 @@
 
 Add your daily tasks. Instagram stays locked until every single one is checked off. Built with Python and a Chrome extension — no accounts, no subscriptions, no cloud.
 
-![FocusGate Demo](https://raw.githubusercontent.com/Samiyakhan456/focusgate/main/screenshots/demo.gif)
+![FocusGate Demo](https://github.com/Samiyakhan456/focusgate/raw/main/screenshots/demo.gif)
 
 ---
 
