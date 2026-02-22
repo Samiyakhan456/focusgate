@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 240px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f5f0e8;
+      color: #1a1814;
+    }
+    .top {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .name { font-size: 14px; font-weight: 800; letter-spacing: 2px; color: #e8502a; }
+    .pill {
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    }
+    .locked   { background: rgba(232,80,42,0.1);  color: #e8502a; border: 1px solid #e8502a; }
+    .unlocked { background: rgba(42,122,74,0.1);  color: #2a7a4a; border: 1px solid #2a7a4a; }
+    .checking { background: rgba(0,0,0,0.05); color: #999; border: 1px solid #ddd; }
+    .body { padding: 13px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .bar-wrap { height: 3px; background: #e0dbd0; border-radius: 99px; overflow: hidden; }
+    .bar-fill  { height: 100%; background: #e8502a; border-radius: 99px; transition: width 0.4s; }
+    .bar-fill.done { background: #2a7a4a; }
+    .msg { font-size: 12px; color: #666; line-height: 1.5; }
+    .btn {
+      display: block; padding: 9px;
+      background: #1a1814; color: #f5f0e8;
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-align: center; text-decoration: none;
+      border-radius: 5px; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.75; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <span class="name">FOCUSGATE</span>
+    <span class="pill checking" id="pill">LOADING</span>
+  </div>
+  <div class="body">
+    <p class="msg" id="msg">Checking status...</p>
+    <div class="bar-wrap"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+    <a class="btn" href="http://localhost:8000" target="_blank">OPEN TASK MANAGER</a>
+  </div>
+  <script>
+    fetch('http://localhost:8000/status')
+      .then(r => r.json())
+      .then(d => {
+        const pill = document.getElementById('pill');
+        const msg  = document.getElementById('msg');
+        const bar  = document.getElementById('bar');
+        const pct  = d.total > 0 ? Math.round((d.done / d.total) * 100) : 0;
+
+        bar.style.width = pct + '%';
+
+        if (d.status === 'unlocked') {
+          pill.className   = 'pill unlocked';
+          pill.textContent = 'UNLOCKED';
+          msg.textContent  = `All ${d.total} tasks done! Instagram is open.`;
+          bar.classList.add('done');
+        } else {
+          pill.className   = 'pill locked';
+          pill.textContent = 'LOCKED';
+          msg.textContent  = d.total === 0
+            ? 'No tasks yet. Add some to get started.'
+            : `${d.done} of ${d.total} done. ${d.remaining} remaining.`;
+        }
+      })
+      .catch(() => {
+        document.getElementById('pill').textContent = 'OFFLINE';
+        document.getElementById('msg').textContent  =
+          'Server not running. Open Terminal and run: python3 server.py';
+      });
+  </script>
+</body>
+</html>

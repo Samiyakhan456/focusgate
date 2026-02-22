@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusGate — Do the work first.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:      #f5f0e8;
+      --cream-dark: #ede7d9;
+      --ink:        #1a1814;
+      --ink-mid:    #4a4540;
+      --ink-light:  #9a9590;
+      --ink-faint:  #ccc8c0;
+      --coral:      #e8502a;
+      --coral-pale: rgba(232,80,42,0.08);
+      --green:      #2a7a4a;
+      --green-pale: rgba(42,122,74,0.09);
+      --border:     rgba(26,24,20,0.10);
+      --shadow:     rgba(26,24,20,0.06);
+      --font-d:     'Syne', sans-serif;
+      --font-b:     'Instrument Sans', sans-serif;
+      --ease:       cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+
+    body {
+      font-family: var(--font-b);
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 32px 48px 0;
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-name {
+      font-family: var(--font-d);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--coral);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: white;
+      font-family: var(--font-d);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--ink-light);
+      transition: all 0.3s;
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--coral);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%,100% { opacity:1; } 50% { opacity:0.3; }
+    }
+
+    .status-pill.unlocked { border-color: var(--green); color: var(--green); }
+    .status-pill.unlocked .status-dot { background: var(--green); animation: none; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 44px 48px 0;
+    }
+
+    h1 {
+      font-family: var(--font-d);
+      font-size: clamp(32px, 6vw, 54px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -1.5px;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--coral);
+    }
+
+    .hero-sub {
+      margin-top: 14px;
+      font-size: 15px;
+      color: var(--ink-light);
+      font-weight: 300;
+      max-width: 400px;
+      line-height: 1.7;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      max-width: 720px;
+      margin: 36px auto 0;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .ring-wrap { position: relative; width: 68px; height: 68px; flex-shrink: 0; }
+    .ring-svg  { transform: rotate(-90deg); }
+    .ring-bg   { fill: none; stroke: var(--cream-dark); stroke-width: 5; }
+    .ring-fill {
+      fill: none; stroke: var(--coral); stroke-width: 5; stroke-linecap: round;
+      stroke-dasharray: 175.9; stroke-dashoffset: 175.9;
+      transition: stroke-dashoffset 0.6s var(--ease), stroke 0.4s;
+    }
+    .ring-fill.done { stroke: var(--green); }
+
+    .ring-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    .ring-num {
+      font-family: var(--font-d);
+      font-size: 17px; font-weight: 800; line-height: 1;
+    }
+
+    .ring-lbl {
+      font-size: 8px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--ink-light);
+    }
+
+    .progress-text-main {
+      font-family: var(--font-d);
+      font-size: 17px; font-weight: 700;
+    }
+
+    .progress-text-sub {
+      margin-top: 3px;
+      font-size: 13px; color: var(--ink-light);
+    }
+
+    /* ── ADD FORM ── */
+    .add-wrap {
+      max-width: 720px;
+      margin: 30px auto 0;
+      padding: 0 48px;
+    }
+
+    .add-form {
+      display: flex;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 2px 10px var(--shadow);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .add-form:focus-within {
+      border-color: var(--coral);
+      box-shadow: 0 0 0 4px var(--coral-pale);
+    }
+
+    .add-input {
+      flex: 1; padding: 15px 18px;
+      border: none; background: transparent;
+      font-family: var(--font-b); font-size: 15px;
+      color: var(--ink); outline: none;
+    }
+
+    .add-input::placeholder { color: var(--ink-faint); }
+
+    .add-btn {
+      padding: 14px 22px;
+      background: var(--coral); color: white;
+      border: none; cursor: pointer;
+      font-family: var(--font-d); font-size: 12px;
+      font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+
+    .add-btn:hover { background: #d44020; }
+
+    /* ── TASK LIST ── */
+    .tasks-wrap {
+      max-width: 720px;
+      margin: 24px auto 0;
+      padding: 0 48px;
+    }
+
+    .tasks-top {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 12px;
+    }
+
+    .tasks-label {
+      font-family: var(--font-d);
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--ink-light);
+    }
+
+    .clear-btn {
+      font-size: 12px; color: var(--ink-light);
+      background: none; border: none; cursor: pointer;
+      text-decoration: underline; text-underline-offset: 3px;
+      transition: color 0.15s;
+    }
+
+    .clear-btn:hover { color: var(--coral); }
+
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+
+    .empty {
+      padding: 48px 20px; text-align: center;
+      border: 1.5px dashed var(--ink-faint);
+      border-radius: 10px; color: var(--ink-faint);
+    }
+
+    .empty-icon { font-size: 28px; margin-bottom: 10px; opacity: 0.5; }
+    .empty p { font-size: 14px; font-weight: 300; }
+
+    .task-item {
+      display: flex; align-items: center; gap: 13px;
+      padding: 13px 17px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      animation: fadeUp 0.22s var(--ease) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(5px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .task-item:hover {
+      border-color: var(--ink-faint);
+      box-shadow: 0 3px 12px var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .task-item.done {
+      background: var(--green-pale);
+      border-color: rgba(42,122,74,0.18);
+    }
+
+    .task-item.done:hover { transform: none; box-shadow: none; }
+
+    .check-box {
+      width: 21px; height: 21px;
+      border: 2px solid var(--ink-faint);
+      border-radius: 6px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .task-item:hover .check-box { border-color: var(--coral); }
+    .task-item.done .check-box  { background: var(--green); border-color: var(--green); }
+
+    .check-icon {
+      opacity: 0; color: white; font-size: 12px; font-weight: 700;
+      transform: scale(0.3); transition: all 0.2s var(--ease);
+    }
+
+    .task-item.done .check-icon { opacity: 1; transform: scale(1); }
+
+    .task-text {
+      flex: 1; font-size: 15px; color: var(--ink);
+      word-break: break-word; transition: all 0.2s;
+    }
+
+    .task-item.done .task-text {
+      text-decoration: line-through; color: var(--ink-light);
+    }
+
+    .del-btn {
+      opacity: 0; background: none; border: none;
+      color: var(--ink-faint); font-size: 20px;
+      cursor: pointer; padding: 2px 5px;
+      border-radius: 4px; line-height: 1;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+
+    .task-item:hover .del-btn { opacity: 1; }
+    .del-btn:hover { color: var(--coral); background: var(--coral-pale); }
+
+    /* ── UNLOCK BANNER ── */
+    .unlock-wrap {
+      max-width: 720px;
+      margin: 28px auto 0;
+      padding: 0 48px;
+      opacity: 0; transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.4s var(--ease);
+    }
+
+    .unlock-wrap.show {
+      opacity: 1; transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .unlock-card {
+      background: linear-gradient(135deg, #0f2a1a, #1a3d28);
+      border-radius: 12px; padding: 28px 32px;
+      display: flex; align-items: center; gap: 20px;
+    }
+
+    .unlock-emoji { font-size: 36px; flex-shrink: 0; }
+
+    .unlock-title {
+      font-family: var(--font-d);
+      font-size: 18px; font-weight: 800; color: #7fffa0;
+    }
+
+    .unlock-sub { font-size: 13px; color: rgba(127,255,160,0.5); margin-top: 3px; }
+
+    .ig-btn {
+      margin-left: auto; flex-shrink: 0;
+      padding: 11px 22px; background: #7fffa0;
+      color: #0f2a1a; font-family: var(--font-d);
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      text-decoration: none; border-radius: 7px;
+      transition: all 0.2s;
+    }
+
+    .ig-btn:hover { background: #a0ffb8; transform: scale(1.03); }
+
+    @media (max-width: 560px) {
+      header, .hero, .progress-wrap,
+      .add-wrap, .tasks-wrap, .unlock-wrap {
+        padding-left: 18px; padding-right: 18px;
+      }
+      h1 { font-size: 30px; }
+      .unlock-card { flex-wrap: wrap; }
+      .ig-btn { margin-left: 0; width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="brand-name">FocusGate</span>
+  <div class="status-pill" id="statusPill">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusLabel">LOCKED</span>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Do the work.<br>Then <em>scroll</em>.</h1>
+  <p class="hero-sub">Instagram stays locked until every task is checked off. No shortcuts.</p>
+</section>
+
+<section class="progress-wrap">
+  <div class="ring-wrap">
+    <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
+      <circle class="ring-bg"   cx="34" cy="34" r="28"/>
+      <circle class="ring-fill" cx="34" cy="34" r="28" id="ringFill"/>
+    </svg>
+    <div class="ring-center">
+      <span class="ring-num" id="ringNum">0</span>
+      <span class="ring-lbl">done</span>
+    </div>
+  </div>
+  <div>
+    <div class="progress-text-main" id="progMain">No tasks yet</div>
+    <div class="progress-text-sub"  id="progSub">Add tasks below to get started.</div>
+  </div>
+</section>
+
+<section class="add-wrap">
+  <form class="add-form" id="addForm">
+    <input class="add-input" id="taskInput" type="text"
+      placeholder="What needs to happen before Instagram?" maxlength="120" autocomplete="off"/>
+    <button class="add-btn" type="submit">Add Task</button>
+  </form>
+</section>
+
+<section class="tasks-wrap">
+  <div class="tasks-top">
+    <span class="tasks-label">Your Tasks</span>
+    <button class="clear-btn" id="clearBtn">Remove completed</button>
+  </div>
+  <ul class="task-list" id="taskList"></ul>
+</section>
+
+<section class="unlock-wrap" id="unlockWrap">
+  <div class="unlock-card">
+    <div class="unlock-emoji">🎉</div>
+    <div>
+      <div class="unlock-title">All tasks complete!</div>
+      <div class="unlock-sub">You earned your Instagram time. Go ahead.</div>
+    </div>
+    <a class="ig-btn" href="https://instagram.com" target="_blank">Open Instagram →</a>
+  </div>
+</section>
+
+<script>
+  // ══════════════════════════════════════════════════════
+  // FocusGate — Task Manager
+  // Tasks are saved to the server (tasks.json) via POST.
+  // The Chrome extension reads /status directly from the
+  // server — no content script or storage sync needed.
+  // ══════════════════════════════════════════════════════
+
+  const SERVER = 'http://localhost:8000';
+  let tasks = [];
+
+  // ── DOM refs ──
+  const taskList  = document.getElementById('taskList');
+  const taskInput = document.getElementById('taskInput');
+  const addForm   = document.getElementById('addForm');
+  const ringFill  = document.getElementById('ringFill');
+  const ringNum   = document.getElementById('ringNum');
+  const progMain  = document.getElementById('progMain');
+  const progSub   = document.getElementById('progSub');
+  const unlockWrap= document.getElementById('unlockWrap');
+  const statusPill= document.getElementById('statusPill');
+  const statusLabel=document.getElementById('statusLabel');
+  const clearBtn  = document.getElementById('clearBtn');
+
+  // ── Save tasks to server ──────────────────────────────
+  // Every change POSTs the full task list to server.py,
+  // which writes it to tasks.json on your computer.
+  async function saveTasks() {
+    try {
+      await fetch(SERVER + '/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tasks)
+      });
+    } catch(e) {
+      console.error('Could not save tasks:', e);
+    }
+  }
+
+  // ── Load tasks from server ────────────────────────────
+  async function loadTasks() {
+    try {
+      const res = await fetch(SERVER + '/tasks');
+      tasks = await res.json();
+    } catch(e) {
+      tasks = [];
+    }
+    render();
+  }
+
+  // ── Task operations ───────────────────────────────────
+  async function addTask(text) {
+    tasks.unshift({ id: Date.now(), text, done: false });
+    await saveTasks();
+    render();
+  }
+
+  async function toggleTask(id) {
+    const t = tasks.find(t => t.id === id);
+    if (t) t.done = !t.done;
+    await saveTasks();
+    render();
+  }
+
+  async function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    await saveTasks();
+    render();
+  }
+
+  async function clearDone() {
+    tasks = tasks.filter(t => !t.done);
+    await saveTasks();
+    render();
+  }
+
+  // ── Render ────────────────────────────────────────────
+  function render() {
+    renderList();
+    renderProgress();
+    renderStatus();
+  }
+
+  function renderList() {
+    taskList.innerHTML = '';
+
+    if (tasks.length === 0) {
+      taskList.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">📋</div>
+          <p>No tasks yet — add one above to lock Instagram.</p>
+        </div>`;
+      return;
+    }
+
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.className = 'task-item' + (task.done ? ' done' : '');
+      li.innerHTML = `
+        <div class="check-box"><span class="check-icon">✓</span></div>
+        <span class="task-text">${esc(task.text)}</span>
+        <button class="del-btn" title="Delete">×</button>`;
+
+      li.addEventListener('click', e => {
+        if (e.target.classList.contains('del-btn')) return;
+        toggleTask(task.id);
+      });
+      li.querySelector('.del-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        deleteTask(task.id);
+      });
+      taskList.appendChild(li);
+    });
+  }
+
+  function renderProgress() {
+    const total   = tasks.length;
+    const done    = tasks.filter(t => t.done).length;
+    const pct     = total === 0 ? 0 : done / total;
+    const allDone = total > 0 && done === total;
+
+    ringFill.style.strokeDashoffset = 175.9 * (1 - pct);
+    ringFill.classList.toggle('done', allDone);
+    ringNum.textContent = done;
+
+    if (total === 0) {
+      progMain.textContent = 'No tasks yet';
+      progSub.textContent  = 'Add tasks below to get started.';
+    } else if (allDone) {
+      progMain.textContent = '🎉 All done!';
+      progSub.textContent  = 'Instagram is unlocked. You earned it.';
+    } else {
+      progMain.textContent = `${done} of ${total} task${total !== 1 ? 's' : ''} done`;
+      progSub.textContent  = `${total - done} remaining — keep going!`;
+    }
+  }
+
+  function renderStatus() {
+    const total   = tasks.length;
+    const done    = tasks.filter(t => t.done).length;
+    const allDone = total > 0 && done === total;
+
+    statusPill.classList.toggle('unlocked', allDone);
+    statusLabel.textContent = allDone ? 'UNLOCKED' : 'LOCKED';
+    unlockWrap.classList.toggle('show', allDone);
+  }
+
+  // ── Events ────────────────────────────────────────────
+  addForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = taskInput.value.trim();
+    if (!text) return;
+    taskInput.value = '';
+    addTask(text);
+  });
+
+  clearBtn.addEventListener('click', clearDone);
+
+  // ── Utility ───────────────────────────────────────────
+  function esc(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
+
+  // ── Init ──────────────────────────────────────────────
+  loadTasks();
+</script>
+</body>
+</html>
